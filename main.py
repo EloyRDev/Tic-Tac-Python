@@ -14,9 +14,23 @@ print(f'''
             ===============
             ''')
 on_game = True
+rounds = 0
 
 table_logic = [[0,0,0], [0,0,0], [0,0,0]]
 table_draw = [["[1]", "[2]", "[3]"], ["[4]", "[5]", "[6]"], ["[7]", "[8]", "[9]"]]
+
+# Helper function to check the user answer and avoid error
+def check_input(i):
+    while not isinstance(i, int):
+        try:
+            i = int(i)
+        except:
+            i = input("Input must be a number: ")
+
+    while i < 1 or i > 9:
+        i = check_input(input("You have to choose a value between 1 and 9: "))
+
+    return i
 
 # Helper function to calculate the position on the grid
 def calculate_pos(p):
@@ -29,13 +43,9 @@ def write_input(p, n):
     if n == 1: sym = " X "
     elif n == 2: sym = " O "
 
-    while p < 1 or p > 9:
-        p = int(input("You have to choose a value between 1 and 9: ") or -1)
-
     v = calculate_pos(p)
-
     while table_logic[v[0]][v[1]] != 0:
-         v = calculate_pos(int(input("Position already taken. Choose a position between 1 and 9: ") or p))
+         v = calculate_pos(check_input(input("Position already taken. Choose a position between 1 and 9: ")))
 
     table_logic[v[0]][v[1]] = n
     table_draw[v[0]][v[1]] = sym
@@ -47,6 +57,12 @@ def execute_victory(pn):
 
 def check_victory(pn):
     y = 0 # Check horizontal lines
+
+    # Check if game is out of rounds
+    if rounds == 9:
+        print("No one won, don't worry be happy :)")
+        return False
+
     while y <= 2:
         if table_logic[y][0] == pn and table_logic[y][1] == pn and table_logic[y][2] == pn: return execute_victory(pn)
         y += 1
@@ -67,7 +83,8 @@ def check_victory(pn):
 while on_game:
     player_num = 1
     while player_num <= 2 and on_game:
-        p = int(input(f"Player {player_num} place your mark: ") or -1)
+        p = check_input(input(f"Player {player_num} place your mark: ") or -1)
+        rounds += 1
         write_input(p, player_num)
         print(f'''
             ===============
