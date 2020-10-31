@@ -13,8 +13,6 @@ print(f'''
             | 7 || 8 || 9 |
             ===============
             ''')
-on_game = True
-rounds = 0
 
 table_logic = [[0,0,0], [0,0,0], [0,0,0]]
 table_draw = [["[1]", "[2]", "[3]"], ["[4]", "[5]", "[6]"], ["[7]", "[8]", "[9]"]]
@@ -41,7 +39,7 @@ def calculate_pos(p):
 # Helper function to write the user input
 def write_input(p, n):
     if n == 1: sym = " X "
-    elif n == 2: sym = " O "
+    else: sym = " O "
 
     v = calculate_pos(p)
     while table_logic[v[0]][v[1]] != 0:
@@ -53,38 +51,34 @@ def write_input(p, n):
 # Helper function to execute victory
 def execute_victory(pn):
     print(f"Congratulations to player {pn}! You won :D")
-    return False
+    return True
 
 def check_victory(pn):
-    y = 0 # Check horizontal lines
-
-    # Check if game is out of rounds
-    if rounds == 9:
-        print("No one won, don't worry be happy :)")
-        return False
-
-    while y <= 2:
+    # Check horizontal lines
+    for y in range(3):
         if table_logic[y][0] == pn and table_logic[y][1] == pn and table_logic[y][2] == pn: return execute_victory(pn)
-        y += 1
 
-    x = 0 # Check vertical lines
-    while x <= 2:
+    # Check vertical lines
+    for x in range(3):
         if table_logic[0][x] == pn and table_logic[1][x] == pn and table_logic[2][x] == pn: return execute_victory(pn)
-        x += 1
 
     # Check diagonals
     if table_logic[0][0] == pn and table_logic[1][1] == pn and table_logic[2][2] == pn: return execute_victory(pn)
     elif table_logic[0][2] == pn and table_logic[1][1] == pn and table_logic[2][0] == pn: return execute_victory(pn)
 
     # The game continues
-    return True
+    return False
 
-# Main while that executes while no player have win
-while on_game:
+# Helper function to change players turn
+def change_player(pn):
+    if pn == 1: return 2
+    else: return 1
+
+# Main loop that executes while no player have win or 9 round did get executed
+def main():
     player_num = 1
-    while player_num <= 2 and on_game:
-        p = check_input(input(f"Player {player_num} place your mark: ") or -1)
-        rounds += 1
+    for r in range(9):
+        p = check_input(input(f"Player {player_num} place your mark: "))
         write_input(p, player_num)
         print(f'''
             ===============
@@ -93,5 +87,9 @@ while on_game:
             |{table_draw[2][0]}||{table_draw[2][1]}||{table_draw[2][2]}|
             ===============
             ''')
-        on_game = check_victory(player_num)
-        player_num += 1
+        if check_victory(player_num): exit()
+        player_num = change_player(player_num)
+
+    print("No one won, don't worry be happy :)")
+
+main()
